@@ -3,10 +3,7 @@ module Main exposing (..)
 import Item
 import Html.App as App
 import Html exposing (..)
-
-
---import Html.Attributes exposing (..)
-
+import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import List exposing (map, filter, head, concat, member)
 import Debug exposing (log)
@@ -57,6 +54,7 @@ type Msg
     = AddParent
     | AddSibling
     | AddChild
+    | Remove
     | Modify Id Item.Msg
 
 
@@ -65,6 +63,9 @@ update message ({ items, uid } as model) =
     let
         active =
             getId (getActive items)
+
+        activeChildren =
+            (log "123" getChildren (getActive items))
 
         parent =
             getId (getParent active items)
@@ -103,6 +104,15 @@ update message ({ items, uid } as model) =
                     , uid = uid + 1
                 }
 
+            Remove ->
+                { model
+                    | items =
+                        items
+                            |> filter (\l -> not (l.id == active))
+                            |> map (addChildren parent activeChildren)
+                    , uid = uid + 1
+                }
+
             Modify id msg ->
                 { model | items = map (updateHelp id msg) items }
 
@@ -116,6 +126,11 @@ updateHelp targetId msg { id, children, model } =
          else
             { model | isActive = False }
         )
+
+
+
+-- removeItem : Id -> List IndexedItem -> List IndexedItem
+-- removeItem targetId items =
 
 
 addChildren : Id -> List Id -> IndexedItem -> IndexedItem
@@ -164,6 +179,16 @@ getId item =
             item.id
 
 
+getChildren : Maybe IndexedItem -> List Id
+getChildren item =
+    case item of
+        Nothing ->
+            []
+
+        Just item ->
+            item.children
+
+
 exclude : List Id -> List Id -> List Id
 exclude full part =
     filter (\l -> not (member l part)) full
@@ -185,12 +210,38 @@ view model =
         addChild =
             button [ onClick AddChild ] [ text "Add Child" ]
 
-        items =
-            map viewIndexedItem model.items
+        remove =
+            button [ onClick Remove ] [ text "Remove" ]
+
+        tree =
+            viewBranches model.items (findRoots model.items)
     in
-        div [] ([ addParent, addSibling, addChild ] ++ items)
+        div [] ([ addParent, addSibling, addChild, remove ] ++ [ tree ])
 
 
-viewIndexedItem : IndexedItem -> Html Msg
-viewIndexedItem { id, children, model } =
-    App.map (Modify id) (div [] [ text (toString id), Item.view model, text (toString children) ])
+findRoots : List IndexedItem -> List Id
+findRoots items =
+    let
+        allIds =
+            map (\l -> l.id) items
+
+        allChildren =
+            items
+                |> map (\l -> l.children)
+                |> concat
+    in
+        exclude allIds allChildren
+
+
+viewBranches : List IndexedItem -> List Id -> Html Msg
+viewBranches items ids =
+    let
+        selectedItems =
+            filter (\l -> member l.id ids) items
+    in
+        case ids of
+            [] ->
+                text ""
+
+            _ ->
+                div [ style [ ( "paddingLeft", "20px" ) ] ] (map (\l -> div [] [ App.map (Modify l.id) (div [] [ Item.view l.model ]), viewBranches items l.children ]) selectedItems)

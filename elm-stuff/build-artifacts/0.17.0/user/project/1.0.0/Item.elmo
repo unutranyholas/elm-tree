@@ -1,0 +1,101 @@
+var _user$project$Item$inputStyle = _elm_lang$core$Native_List.fromArray(
+	[
+		{ctor: '_Tuple2', _0: 'border', _1: 'none'},
+		{ctor: '_Tuple2', _0: 'background', _1: 'transparent'},
+		{ctor: '_Tuple2', _0: 'color', _1: '#fff'},
+		{ctor: '_Tuple2', _0: 'padding', _1: '0px'},
+		{ctor: '_Tuple2', _0: 'fontSize', _1: 'inherit'},
+		{ctor: '_Tuple2', _0: 'fontFamily', _1: 'inherit'}
+	]);
+var _user$project$Item$basicItem = _elm_lang$core$Native_List.fromArray(
+	[
+		{ctor: '_Tuple2', _0: 'padding', _1: '12px 24px'},
+		{ctor: '_Tuple2', _0: 'display', _1: 'inline-block'},
+		{ctor: '_Tuple2', _0: 'fontSize', _1: '14px'},
+		{ctor: '_Tuple2', _0: 'fontFamily', _1: 'Helvetica, Arial, sans-serif'}
+	]);
+var _user$project$Item$activeItem = function (color) {
+	return _elm_lang$core$List$concat(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_user$project$Item$basicItem,
+				_elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 'backgroundColor', _1: color}
+				])
+			]));
+};
+var _user$project$Item$defaultItem = function (color) {
+	return _elm_lang$core$List$concat(
+		_elm_lang$core$Native_List.fromArray(
+			[
+				_user$project$Item$basicItem,
+				_elm_lang$core$Native_List.fromArray(
+				[
+					{ctor: '_Tuple2', _0: 'color', _1: color}
+				])
+			]));
+};
+var _user$project$Item$update = F2(
+	function (msg, model) {
+		var _p0 = msg;
+		if (_p0.ctor === 'Rename') {
+			return _elm_lang$core$Native_Utils.update(
+				model,
+				{name: _p0._0});
+		} else {
+			return _elm_lang$core$Native_Utils.update(
+				model,
+				{isActive: true});
+		}
+	});
+var _user$project$Item$init = function (name) {
+	return {name: name, color: '#660000', isActive: true};
+};
+var _user$project$Item$Model = F3(
+	function (a, b, c) {
+		return {name: a, color: b, isActive: c};
+	});
+var _user$project$Item$Activate = {ctor: 'Activate'};
+var _user$project$Item$Rename = function (a) {
+	return {ctor: 'Rename', _0: a};
+};
+var _user$project$Item$view = function (model) {
+	var _p1 = model.isActive;
+	if (_p1 === false) {
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$style(
+					_user$project$Item$defaultItem(model.color)),
+					_elm_lang$html$Html_Events$onClick(_user$project$Item$Activate)
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html$text(model.name)
+				]));
+	} else {
+		return A2(
+			_elm_lang$html$Html$div,
+			_elm_lang$core$Native_List.fromArray(
+				[
+					_elm_lang$html$Html_Attributes$style(
+					_user$project$Item$activeItem(model.color))
+				]),
+			_elm_lang$core$Native_List.fromArray(
+				[
+					A2(
+					_elm_lang$html$Html$input,
+					_elm_lang$core$Native_List.fromArray(
+						[
+							_elm_lang$html$Html_Attributes$type$('text'),
+							_elm_lang$html$Html_Attributes$style(_user$project$Item$inputStyle),
+							_elm_lang$html$Html_Attributes$value(model.name),
+							_elm_lang$html$Html_Events$onInput(_user$project$Item$Rename)
+						]),
+					_elm_lang$core$Native_List.fromArray(
+						[]))
+				]));
+	}
+};
